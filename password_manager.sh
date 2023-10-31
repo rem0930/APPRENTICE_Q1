@@ -19,6 +19,7 @@ while true; do
         "Get Password")
             read -p "サービス名を入力してください: " serviceName
             # serviceNameに対応するpassをpasswords.txtファイルから取得
+            # cut -d: -f3: 「:」で区切られた3番目のフィールド（パスワード）を取得
             password=$(grep "^$serviceName:" passwords.txt | cut -d: -f3)
 
             if [ -z "$password" ]; then
@@ -26,6 +27,7 @@ while true; do
             else
                 echo "サービス名：$serviceName"
                 # サービス名に対応するユーザー名を表示
+                # cut -d: -f2: 「:」で区切られた2番目のフィールド（ユーザー名）を取得。
                 echo "ユーザー名：$(grep "^$serviceName:" passwords.txt | cut -d: -f2)"
                 # サービス名に対応するパスワードを表示
                 echo "パスワード：$password"
