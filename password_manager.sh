@@ -8,16 +8,26 @@ while true; do
 
     case $choice in
         "Add Password")
+            # -pオプションでメッセージ（プロンプト）を表示
             read -p "サービス名を入力してください: " serviceName
             read -p "ユーザー名を入力してください: " userName
+            
             # -s: 入力されたパスワードを表示させない
             read -s -p "パスワードを入力してください: " password
             # 入力された情報をpasswords.txtファイルに追記する
             echo "$serviceName:$userName:$password" >> passwords.txt
+            
+            # 入力ファイルを暗号化して出力ファイルに保存する
+            gpg -r "recipient@example.com" -e -o passwords.gpg passwords.txt
+            
+            
             echo "パスワードの追加は成功しました。"
+            # ;; 各処理の終了を示す。省略可能。
             ;;
         "Get Password")
             read -p "サービス名を入力してください: " serviceName
+            # 復号化したデータを一時ファイルに保存
+            gpg -d password.gpg > password.txt 2> /dev/null
             # serviceNameに対応するpassをpasswords.txtファイルから取得
             # cut -d: -f3: 「:」で区切られた3番目のフィールド（パスワード）を取得
             password=$(grep "^$serviceName:" passwords.txt | cut -d: -f3)
@@ -37,8 +47,13 @@ while true; do
             echo "Thank you!"
             exit
             ;;
+            
+        # *)どの値にも一致しなかった場合の処理
         *)
             echo "入力が間違えています。Add Password/Get Password/Exitから入力してください。"
             ;;
     esac
 done
+
+# 一時ファイルを削除する。
+    rm password.txt
